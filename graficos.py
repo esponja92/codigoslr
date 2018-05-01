@@ -4,6 +4,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import scipy.stats as stats
 
 """
 
@@ -11,7 +12,7 @@ Escrever funções para mostrar os gráficos capazes de responder as seguintes q
 
 Sobre os trabalhos selecionados:
     Quais são as palavras-chaves utilizadas?
-    Qual o percentual de acerto? (quantas palavras da string de busca o artigo curtiu?)
+    Qual o percentual de acerto? (quantas palavras da string de busca o artigo curtiu(????))
     Qual o número de páginas?
 
 Sobre os trabalhos cortados:
@@ -36,9 +37,14 @@ mediaSoma = dfPoint['somatorio'].mean()
 
 """
 
-df = pd.DataFrame(pd.read_csv("dados.csv"))
+#ponteiros globais para os dados do csv, que devem ser passados na chamada das funções
+df1 = pd.DataFrame(pd.read_csv("todos.csv"))
 
-def mostrar_grafico_artigos_por_ano():
+df2 = pd.DataFrame(pd.read_csv("menosdedois.csv"))
+
+df3 = pd.DataFrame(pd.read_csv("maisdedois.csv"))
+
+def mostrar_grafico_artigos_por_ano(df):
 
     """
     Neste caso nao eh um histograma!!
@@ -57,21 +63,39 @@ def mostrar_grafico_artigos_por_ano():
 
     anos_dict.sort()
        
-    plt.title("Histograma - Artigos por Ano")
+    plt.title("Artigos por Ano")
     plt.xlabel("Ano")
     plt.ylabel("Numero de Artigos")
 
-    x = [e[0] for e in anos_dict]
-    b = [e[1] for e in anos_dict]
-
-
-    plt.bar(range(len(anos_dict)), b, align='center')
-    plt.xticks(range(len(anos_dict)), x)
+    plt.bar(range(len(anos_dict)), [e[1] for e in anos_dict], align='center')
+    plt.xticks(range(len(anos_dict)), [e[0] for e in anos_dict])
 
     plt.show()
 
+def mostrar_grafico_pontuacao_total_por_artigo(df):
 
-def mostrar_histograma_artigos_pontuacao():
+    somatorio = pd.DataFrame(np.array(df.iloc[1:,7]))
+    somatorio.columns = ['somatorio']
+    somatorio = somatorio.apply(pd.to_numeric)
+
+    s = somatorio['somatorio']
+
+    N = len(s)
+    ind = np.arange(N)    # the x locations for the groups
+    width = 0.5       # the width of the bars: can also be len(x) sequence
+
+    p1t = plt.bar(ind, s, width, color='red', align='center')
+
+    plt.autoscale(enable=True, axis='both', tight=None)
+    plt.ylabel('Pontuacao')
+    plt.xlabel('Artigos')
+    plt.title('Pontuacao por Artigo')
+    plt.xticks(ind,('A1','A2','A3','A4','A5','A6','A7','A8','A9','A10','A11','A12', 'A13'))
+    plt.yticks(np.arange(0, 3.5, 0.5))
+    plt.show()
+
+
+def mostrar_histograma_artigos_pontuacao(df, normalizado):
 
     dfPoint = pd.DataFrame(np.array(df.iloc[1:,7]))
 
@@ -80,14 +104,14 @@ def mostrar_histograma_artigos_pontuacao():
 
     hist=np.histogram(dfPoint['somatorio'], density=True)
 
-    plt.hist(dfPoint['somatorio'], bins='auto')  # arguments are passed to np.histogram
+    plt.hist(dfPoint['somatorio'], bins='auto', normed=normalizado)  # arguments are passed to np.histogram
     plt.title("Histograma - Pontuacao dos Artigos")
     plt.xlabel("Pontuacao")
     plt.ylabel("Numero de Artigos")
     plt.show()
     
 
-def mostrar_grafico_barras():
+def mostrar_grafico_pontuacao_parcial_por_artigo(df):
 
     notaGrazi = pd.DataFrame(np.array(df.iloc[1:,4]))
     notaHugo = pd.DataFrame(np.array(df.iloc[1:,5]))
@@ -101,9 +125,9 @@ def mostrar_grafico_barras():
     j = dfPoint['notaJessica']
     h = dfPoint['notaHugo']
 
-    N = 13
+    N = len(s)
     ind = np.arange(N)    # the x locations for the groups
-    width = 0.35       # the width of the bars: can also be len(x) sequence
+    width = 0.5       # the width of the bars: can also be len(x) sequence
 
     p1 = plt.bar(ind, g, width, color='red')
     p2 = plt.bar(ind, h, width, bottom=g, color='blue')
