@@ -18,7 +18,7 @@ Sobre os trabalhos cortados:
     Quais são as palavras-chaves utilizadas?
     Quantas vezes as palavras utilizadas na string de busca apareceram nos artigos?
 
-Para todos:
+Para todos (feita):
     Qual o ano de publicação?
 
 Perguntas que desistimos:
@@ -36,17 +36,46 @@ mediaSoma = dfPoint['somatorio'].mean()
 
 """
 
+df = pd.DataFrame(pd.read_csv("dados.csv"))
+
+def mostrar_grafico_artigos_por_ano():
+
+    """
+    Neste caso nao eh um histograma!!
+    """
+
+    dfPoint = pd.DataFrame(np.array(df.iloc[1:,8]))
+
+    dfPoint.columns = ['ano']
+    lista_de_anos = dfPoint['ano'].tolist()
+
+    anos_dict = []
+    for ano in lista_de_anos:
+        e = (ano, lista_de_anos.count(ano))
+        if e not in anos_dict:
+            anos_dict.append(e)
+
+    anos_dict.sort()
+       
+    plt.title("Histograma - Artigos por Ano")
+    plt.xlabel("Ano")
+    plt.ylabel("Numero de Artigos")
+
+    x = [e[0] for e in anos_dict]
+    b = [e[1] for e in anos_dict]
+
+
+    plt.bar(range(len(anos_dict)), b, align='center')
+    plt.xticks(range(len(anos_dict)), x)
+
+    plt.show()
+
+
 def mostrar_histograma_artigos_pontuacao():
 
-    df = pd.DataFrame(pd.read_csv("dados.csv"))
+    dfPoint = pd.DataFrame(np.array(df.iloc[1:,7]))
 
-    notaGrazi = pd.DataFrame(np.array(df.iloc[1:,4]))
-    notaHugo = pd.DataFrame(np.array(df.iloc[1:,5]))
-    notaJessica = pd.DataFrame(np.array(df.iloc[1:,6]))
-    somatorio = pd.DataFrame(np.array(df.iloc[1:,7]))
-
-    dfPoint = pd.concat([notaGrazi,notaHugo,notaJessica,somatorio],axis=1)
-    dfPoint.columns = ['notaGrazi','notaHugo','notaJessica','somatorio']
+    dfPoint.columns = ['somatorio']
     dfPoint = dfPoint.apply(pd.to_numeric)
 
     hist=np.histogram(dfPoint['somatorio'], density=True)
@@ -60,15 +89,12 @@ def mostrar_histograma_artigos_pontuacao():
 
 def mostrar_grafico_barras():
 
-    df = pd.DataFrame(pd.read_csv("dados.csv"))
-
     notaGrazi = pd.DataFrame(np.array(df.iloc[1:,4]))
     notaHugo = pd.DataFrame(np.array(df.iloc[1:,5]))
     notaJessica = pd.DataFrame(np.array(df.iloc[1:,6]))
-    somatorio = pd.DataFrame(np.array(df.iloc[1:,7]))
 
-    dfPoint = pd.concat([notaGrazi,notaHugo,notaJessica,somatorio],axis=1)
-    dfPoint.columns = ['notaGrazi','notaHugo','notaJessica','somatorio']
+    dfPoint = pd.concat([notaGrazi,notaHugo,notaJessica],axis=1)
+    dfPoint.columns = ['notaGrazi','notaHugo','notaJessica']
     dfPoint = dfPoint.apply(pd.to_numeric)
 
     g = dfPoint['notaGrazi']
